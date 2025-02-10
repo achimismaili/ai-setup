@@ -96,6 +96,15 @@ setup_ollama_model() {
 setup_pip_software() {
     local PACKAGE=$1
 
+    # first, check if python and pip is installed and if not, install it
+    setup_apt_software "python3"
+
+    # Ensure python3-pip is installed
+    setup_apt_software "python3-pip" "command -v pip3"
+
+    # Ensure python3-venv is installed
+    setup_apt_software "python3-venv"
+
     # Create and activate the virtual environment if it doesn't exist
     if [ ! -f "$PIPVIRTUALENV_DIR/bin/activate" ]; then
         python3 -m venv "$PIPVIRTUALENV_DIR"
@@ -130,10 +139,6 @@ setup_curl_software "ollama"
 setup_ollama_model "qwen:7b"
 
 # setup speech
-
-# first, check if python and pip is installed and if not, install it
-setup_apt_software "python3"
-setup_apt_software "python3-pip" "command -v pip3"
 
 # install bark ai
 setup_pip_software "bark"
