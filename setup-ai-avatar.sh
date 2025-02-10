@@ -35,6 +35,13 @@ ensure_software_directory() {
     echo "Now in directory: $(pwd)"
 }
 
+# Function to add the missing public key for Microsoft Edge repository
+add_microsoft_edge_gpg_key() {
+    echo "Adding missing GPG key for Microsoft Edge repository..."
+    curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+    sudo apt-get update
+}
+
 # Consolidated function to check and wait for software installation
 check_and_wait_for_installation() {
     local SOFTWARE=$1
@@ -78,9 +85,9 @@ setup_ollama_model() {
 
 ## Main
 
-# check if python and pip is installed and if not, install it
-setup_apt_software "python3"
-setup_apt_software "python3-pip"
+# There was an installation problem with phyton pip, so I added the following line
+# Add missing GPG key for Microsoft Edge repository
+add_microsoft_edge_gpg_key
 
 # setup Ollama
 setup_curl_software "ollama"
@@ -88,9 +95,26 @@ setup_curl_software "ollama"
 # setup qwen:7b directly in Ollama directory
 setup_ollama_model "qwen:7b"
 
+# setup speech
 
+# first, check if python and pip is installed and if not, install it
+setup_apt_software "python3"
+setup_apt_software "python3-pip"
+
+# create and activate a virtual environment for python pip
+PIPVIRTUALENV_DIR="$BaseDir/python-pip-venv"
+if [ ! -d "$PIPVIRTUALENV_DIR" ]; then
+    python3 -m venv "$PIPVIRTUALENV_DIR"
+fi
+source "$PIPVIRTUALENV_DIR/bin/activate"
+
+# install bark ai
+pip install bark
 
 ## start avatar environment
+
+# Activate the virtual environment before running any commands that depend on it
+source "$PIPVIRTUALENV_DIR/bin/activate"
 
 ## run qwen:7b
 # ollama run qwen:7b
