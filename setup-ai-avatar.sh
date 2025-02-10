@@ -18,8 +18,11 @@ BaseDir="/home/$(whoami)/ai"
 ## Functions
 
 # Function to check and move into a directory
-move_into_directory() {
-    local DIR=$1
+ensure_software_directory() {
+    local SOFTWARE=$1
+    local DIR_NAME=$(echo "$SOFTWARE" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')
+    local DIR="$BaseDir/$DIR_NAME"
+
     # Check if the directory exists
     if [ ! -d "$DIR" ]; then
         echo "Directory does not exist. Creating..."
@@ -53,24 +56,21 @@ check_and_wait_for_installation() {
     fi
 }
 
-# Function to check and setup system software using curl
-setup_curl_software() {
-    local SOFTWARE=$1
-    local DIR_NAME=$(echo "$SOFTWARE" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')
-    local DIR="$BaseDir/$DIR_NAME"
-
-    move_into_directory "$DIR"
-
-    check_and_wait_for_installation "$SOFTWARE" "command -v $SOFTWARE" "curl -fsSL https://ollama.com/install.sh | sh"
-}
-
 # Function to check and setup system software using sudo apt-get
 setup_apt_software() {
     local SOFTWARE=$1
     check_and_wait_for_installation "$SOFTWARE" "command -v $SOFTWARE" "sudo apt-get update && sudo apt-get install -y $SOFTWARE"
 }
 
-# Function to check and setup ollama model
+# Function to check and setup system software using curl
+setup_curl_software() {
+    local SOFTWARE=$1
+
+    ensure_software_directory "$SOFTWARE"
+    check_and_wait_for_installation "$SOFTWARE" "command -v $SOFTWARE" "curl -fsSL https://ollama.com/install.sh | sh"
+}
+
+# Function to check and setup ollama models
 setup_ollama_model() {
     local MODEL=$1
     check_and_wait_for_installation "$MODEL" "ollama list | grep -q $MODEL" "ollama pull $MODEL"
@@ -78,15 +78,17 @@ setup_ollama_model() {
 
 ## Main
 
+# check if python and pip is installed and if not, install it
+setup_apt_software "python3"
+setup_apt_software "python3-pip"
+
 # setup Ollama
 setup_curl_software "ollama"
 
 # setup qwen:7b directly in Ollama directory
 setup_ollama_model "qwen:7b"
 
-# check if python and pip is installed and if not, install it
-setup_apt_software "python3"
-setup_apt_software "python3-pip"
+
 
 ## start avatar environment
 
