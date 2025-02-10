@@ -167,12 +167,16 @@ setup_pip_software "scipy"
 # for direct sound output
 setup_pip_software "sounddevice"
 
-
-# For GPUs:
-# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118  # For CUDA 11.8
-
 # Install PortAudio library
 setup_apt_software "portaudio19-dev" "dpkg -l | grep -qw portaudio19-dev"
+
+# Install ALSA plugins for hearing wsl2 sound in windows
+setup_apt_software libasound2-plugins
+
+# check, if .asounrc file is available in home directory, if not copy from this directory
+if [ ! -f ~/.asoundrc ]; then
+    cp .asoundrc ~/.asoundrc
+fi
 
 ## start avatar environment
 

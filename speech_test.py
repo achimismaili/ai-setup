@@ -31,7 +31,7 @@ voice_preset = list(voices.values())[choice]
 
 # User input text
 # text = input("\nGeben Sie Ihren Text ein: ")
-text = "Dies ist ein Beispieltext, alles sollte idealerweise klappen."
+text = "Marion Ismaili ist ein lieber Schatz."
 
 # Detect if GPU is available
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -45,9 +45,9 @@ print(f"Using {device.upper()} for Bark TTS")
 audio_array = generate_audio(text, history_prompt=voice_preset)
 
 # Save to file
-# output_filename = "bark_deutsch_output.wav"
-# write(output_filename, SAMPLE_RATE, audio_array)
-# print(f"\n✅ Sprachdatei gespeichert als '{output_filename}'")
+output_filename = "bark_deutsch_output.wav"
+write(output_filename, SAMPLE_RATE, audio_array)
+print(f"\n✅ Sprachdatei gespeichert als '{output_filename}'")
 
 # Play audio
 # print("\n🔊 Spiele Audio ab...")
