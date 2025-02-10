@@ -40,10 +40,11 @@ ensure_software_directory() {
 # Function to add the missing public key for Microsoft Edge repository
 add_microsoft_edge_gpg_key() {
     local KEY_FINGERPRINT="EB3E94ADBE1229CF"
-    if ! gpg --list-keys "$KEY_FINGERPRINT" &> /dev/null; then
+    local KEYRING_FILE="/usr/share/keyrings/microsoft-archive-keyring.gpg"
+    if ! gpg --no-default-keyring --keyring "$KEYRING_FILE" --list-keys "$KEY_FINGERPRINT" &> /dev/null; then
         echo "Adding missing GPG key for Microsoft Edge repository..."
-        curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/edge stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
+        curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o "$KEYRING_FILE"
+        echo "deb [signed-by=$KEYRING_FILE] https://packages.microsoft.com/repos/edge stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
         sudo apt-get update
     else
         echo "GPG key for Microsoft Edge repository already exists."
@@ -151,6 +152,9 @@ setup_pip_software "bark"
 
 # Activate the virtual environment before running any commands that depend on it
 source "$PIPVIRTUALENV_DIR/bin/activate"
+
+# Run the Python script to generate speech
+python3 /home/ismaili/code/ai-setup/generate_speech.py
 
 ## run qwen:7b
 # ollama run qwen:7b
