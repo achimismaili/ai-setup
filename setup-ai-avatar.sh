@@ -149,8 +149,7 @@ setup_ollama_model "qwen:7b"
 setup_pip_software "bark"
 
 # install dependencies torch, numpy, scipy
-
-setup_pip_software  "numpy"
+setup_pip_software "numpy"
 setup_pip_software "scipy"
 # for direct sound output
 setup_pip_software "sounddevice"
@@ -161,6 +160,8 @@ setup_pip_software "torch"
 # For GPUs:
 # pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118  # For CUDA 11.8
 
+# Install PortAudio library
+setup_apt_software "portaudio19-dev"
 
 ## start avatar environment
 
