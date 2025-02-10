@@ -172,8 +172,17 @@ setup_pip_software "torchaudio" "https://download.pytorch.org/whl/cu118"
 # setup_pip_software "numpy"
 # current numpy 2.2.2 is not compatible with outdated torch version, so installing numpy 1.26.4
 # ... but numpy 1.26.4 is not available in the default pip repository
-wget https://files.pythonhosted.org/packages/0f/50/de23fde84e45f5c4fda2488c759b69990fd4512387a8632860f3ac9cd225/numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-setup_pip_software numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+Numpy_pip_name="numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+
+if [ ! -f "$PIPVIRTUALENV_DIR/bin/activate" ]; then
+    python3 -m venv "$PIPVIRTUALENV_DIR"
+fi
+source "$PIPVIRTUALENV_DIR/bin/activate"
+if ! pip show "numpy" &> /dev/null; then
+    wget "https://files.pythonhosted.org/packages/0f/50/de23fde84e45f5c4fda2488c759b69990fd4512387a8632860f3ac9cd225/$Numpy_pip_name"
+fi 
+
+setup_pip_software $Numpy_pip_name
 
 setup_pip_software "scipy"
 # for direct sound output
@@ -183,7 +192,7 @@ setup_pip_software "sounddevice"
 setup_apt_software "portaudio19-dev" "dpkg -l | grep -qw portaudio19-dev"
 
 # Install ALSA plugins for hearing wsl2 sound in windows
-setup_apt_software libasound2-plugins
+setup_apt_software "libasound2-plugins" "dpkg -l | grep -qw libasound2-plugins"
 
 # check, if .asounrc file is available in home directory, if not copy from this directory
 if [ ! -f ~/.asoundrc ]; then
