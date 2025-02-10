@@ -64,9 +64,14 @@ check_and_wait_for_installation() {
 }
 
 # Function to check and setup system software using sudo apt-get
+# First parameter is the name of the apt package to install.
+# the function accepts an optional second parameter CHECK_COMMAND. 
+# If the second parameter is provided, it will use that command to check for the software; 
+# otherwise, it will default to command -v $SOFTWARE.
 setup_apt_software() {
     local SOFTWARE=$1
-    check_and_wait_for_installation "$SOFTWARE" "command -v $SOFTWARE" "sudo apt-get update && sudo apt-get install -y $SOFTWARE"
+    local CHECK_COMMAND=${2:-"command -v $SOFTWARE"}
+    check_and_wait_for_installation "$SOFTWARE" "$CHECK_COMMAND" "sudo apt-get update && sudo apt-get install -y $SOFTWARE"
 }
 
 # Function to check and setup system software using curl
@@ -81,6 +86,24 @@ setup_curl_software() {
 setup_ollama_model() {
     local MODEL=$1
     check_and_wait_for_installation "$MODEL" "ollama list | grep -q $MODEL" "ollama pull $MODEL"
+}
+
+# Function to check and setup pip packages
+setup_pip_software() {
+    local PACKAGE=$1
+    if ! pip show "$PACKAGE" &> /dev/null; then
+        echo "Pip package $PACKAGE is not installed. Installing..."
+        pip install "$PACKAGE"
+
+        # wait for package to install
+        while ! pip show "$PACKAGE" &> /dev/null; do
+            echo "Waiting for $PACKAGE to install..."
+            sleep 5
+        done
+        echo "$PACKAGE installed successfully!"
+    else
+        echo "$PACKAGE already installed!"
+    fi
 }
 
 ## Main
@@ -99,7 +122,7 @@ setup_ollama_model "qwen:7b"
 
 # first, check if python and pip is installed and if not, install it
 setup_apt_software "python3"
-setup_apt_software "python3-pip"
+setup_apt_software "python3-pip" "command -v pip3"
 
 # create and activate a virtual environment for python pip
 PIPVIRTUALENV_DIR="$BaseDir/python-pip-venv"
@@ -109,7 +132,7 @@ fi
 source "$PIPVIRTUALENV_DIR/bin/activate"
 
 # install bark ai
-pip install bark
+setup_pip_software "bark"
 
 ## start avatar environment
 
