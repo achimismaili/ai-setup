@@ -12,9 +12,8 @@
 
 ## Configuration
 
+# The directory, where all software is installed
 BaseDir="/home/$(whoami)/ai"
-DirOllama="$BaseDir/ollama"
-DirQwen="$BaseDir/qwen7b"
 
 ## Functions
 
@@ -33,37 +32,63 @@ move_into_directory() {
     echo "Now in directory: $(pwd)"
 }
 
-# Function to wait and check if software is installed
-wait_for_installation() {
+# Consolidated function to check and wait for software installation
+check_and_wait_for_installation() {
     local SOFTWARE=$1
-    while ! command -v "$SOFTWARE" &> /dev/null; do
-        echo "Waiting for $SOFTWARE to install..."
-        sleep 5
-    done
-    echo "$SOFTWARE installed successfully!"
+    local CHECK_COMMAND=$2
+    local INSTALL_COMMAND=$3
+
+    if ! eval "$CHECK_COMMAND" &> /dev/null; then
+        echo "$SOFTWARE not installed. Installing..."
+        eval "$INSTALL_COMMAND"
+
+        # wait for software to install
+        while ! eval "$CHECK_COMMAND" &> /dev/null; do
+            echo "Waiting for $SOFTWARE to install..."
+            sleep 5
+        done
+        echo "$SOFTWARE installed successfully!"
+    else
+        echo "$SOFTWARE already installed!"
+    fi
 }
 
+# Function to check and setup system software using curl
+setup_curl_software() {
+    local SOFTWARE=$1
+    local DIR_NAME=$(echo "$SOFTWARE" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')
+    local DIR="$BaseDir/$DIR_NAME"
+
+    move_into_directory "$DIR"
+
+    check_and_wait_for_installation "$SOFTWARE" "command -v $SOFTWARE" "curl -fsSL https://ollama.com/install.sh | sh"
+}
+
+# Function to check and setup system software using sudo apt-get
+setup_apt_software() {
+    local SOFTWARE=$1
+    check_and_wait_for_installation "$SOFTWARE" "command -v $SOFTWARE" "sudo apt-get update && sudo apt-get install -y $SOFTWARE"
+}
+
+# Function to check and setup ollama model
+setup_ollama_model() {
+    local MODEL=$1
+    check_and_wait_for_installation "$MODEL" "ollama list | grep -q $MODEL" "ollama pull $MODEL"
+}
 
 ## Main
 
-# Go to Ollama folder
-move_into_directory "$DirOllama"
+# setup Ollama
+setup_curl_software "ollama"
 
-# check if Ollama is installed, if not install it
-if ! command -v "ollama" &> /dev/null; then
-    echo "Ollama not installed. Installing..."
-    # setup Ollama
-    curl -fsSL https://ollama.com/install.sh | sh
+# setup qwen:7b directly in Ollama directory
+setup_ollama_model "qwen:7b"
 
-    # wait for Ollama to install
-    wait_for_installation "ollama"
+# check if python and pip is installed and if not, install it
+setup_apt_software "python3"
+setup_apt_software "python3-pip"
 
-else
-    echo "Ollama already installed!"
-fi
+## start avatar environment
 
-
-# Go to qwen folder
-move_into_directory "$DirQwen"
-
-# setup qwen
+## run qwen:7b
+# ollama run qwen:7b
