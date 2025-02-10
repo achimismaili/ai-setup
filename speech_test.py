@@ -1,4 +1,7 @@
-import torch
+import os
+os.environ["TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD"] = "1"
+
+import torch  # Now PyTorch will respect the setting
 import sounddevice as sd
 from bark import generate_audio, SAMPLE_RATE
 from scipy.io.wavfile import write
@@ -33,8 +36,6 @@ text = "Dies ist ein Beispieltext, alles sollte idealerweise klappen."
 # Detect if GPU is available
 device = "cuda" if torch.cuda.is_available() else "cpu"
 torch.set_default_device(device)
-
-model = torch.load("/home/ismaili/.cache/suno/bark_v0/text_2.pt", map_location="cuda", weights_only=False)
 
 print(f"Using {device.upper()} for Bark TTS")
 

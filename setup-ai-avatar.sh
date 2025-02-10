@@ -149,13 +149,24 @@ setup_ollama_model "qwen:7b"
 setup_pip_software "bark"
 
 # install dependencies torch, numpy, scipy
-setup_pip_software "numpy"
+
+# torch is also for running Bark on GPU, to check, run "nvidia-smi", if GPU is detected
+# setup_pip_software "torch"
+# getting torch to work was pain in the a**
+# torch 2.1 does not work with python 3.12 anymore, touch 2.6 causes too many issues, so I selected 2.2.2
+# Following is the command to install torch 2.2.2 with cuda 11.8 (cu118 is the right NVIDIA GPU support version for my GPU)
+pip install torch==2.2.2+cu118 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# setup_pip_software "numpy"
+# current numpy 2.2.2 is not compatible with outdated torch version, so installing numpy 1.26.4
+# ... but numpy 1.26.4 is not available in the default pip repository
+wget https://files.pythonhosted.org/packages/0f/50/de23fde84e45f5c4fda2488c759b69990fd4512387a8632860f3ac9cd225/numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+pip install numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+
 setup_pip_software "scipy"
 # for direct sound output
 setup_pip_software "sounddevice"
-# Running Bark on GPU
-# nvidia-smi  # Check if GPU is detected
-setup_pip_software "torch"
+
 
 # For GPUs:
 # pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118  # For CUDA 11.8
