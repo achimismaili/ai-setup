@@ -72,6 +72,10 @@ check_and_wait_for_installation() {
 }
 
 # Function to check and setup system software using sudo apt-get
+# First parameter is the name of the apt package to install.
+# The function accepts an optional second parameter CHECK_COMMAND. 
+# If the second parameter is provided, it will use that command to check for the software; 
+# otherwise, it will default to command -v $SOFTWARE.
 setup_apt_software() {
     local SOFTWARE=$1
     local CHECK_COMMAND=${2:-"command -v $SOFTWARE"}
@@ -103,7 +107,7 @@ setup_pip_software() {
     setup_apt_software "python3-pip" "command -v pip3"
 
     # Ensure python3-venv is installed
-    setup_apt_software "python3-venv"
+    setup_apt_software "python3-venv" "dpkg -l | grep -qw python3-venv"
 
     # Create and activate the virtual environment if it doesn't exist
     if [ ! -f "$PIPVIRTUALENV_DIR/bin/activate" ]; then
