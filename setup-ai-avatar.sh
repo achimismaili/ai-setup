@@ -161,7 +161,7 @@ setup_pip_software "torch"
 # pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118  # For CUDA 11.8
 
 # Install PortAudio library
-setup_apt_software "portaudio19-dev"
+setup_apt_software "portaudio19-dev" "dpkg -l | grep -qw portaudio19-dev"
 
 ## start avatar environment
 
@@ -169,7 +169,7 @@ setup_apt_software "portaudio19-dev"
 source "$PIPVIRTUALENV_DIR/bin/activate"
 
 # Run the Python script to generate speech
-python3 /home/ismaili/code/ai-setup/generate_speech.py
+# python3 /home/ismaili/code/ai-setup/generate_speech.py
 
 ## run qwen:7b
 # ollama run qwen:7b
