@@ -14,6 +14,8 @@
 
 # The directory, where all software is installed
 BaseDir="/home/$(whoami)/ai"
+# The directory for the Python virtual environment
+PIPVIRTUALENV_DIR="$BaseDir/python-pip-venv"
 
 ## Functions
 
@@ -64,10 +66,6 @@ check_and_wait_for_installation() {
 }
 
 # Function to check and setup system software using sudo apt-get
-# First parameter is the name of the apt package to install.
-# the function accepts an optional second parameter CHECK_COMMAND. 
-# If the second parameter is provided, it will use that command to check for the software; 
-# otherwise, it will default to command -v $SOFTWARE.
 setup_apt_software() {
     local SOFTWARE=$1
     local CHECK_COMMAND=${2:-"command -v $SOFTWARE"}
@@ -91,6 +89,13 @@ setup_ollama_model() {
 # Function to check and setup pip packages
 setup_pip_software() {
     local PACKAGE=$1
+
+    # Create and activate the virtual environment if it doesn't exist
+    if [ ! -f "$PIPVIRTUALENV_DIR/bin/activate" ]; then
+        python3 -m venv "$PIPVIRTUALENV_DIR"
+    fi
+    source "$PIPVIRTUALENV_DIR/bin/activate"
+
     if ! pip show "$PACKAGE" &> /dev/null; then
         echo "Pip package $PACKAGE is not installed. Installing..."
         pip install "$PACKAGE"
@@ -123,13 +128,6 @@ setup_ollama_model "qwen:7b"
 # first, check if python and pip is installed and if not, install it
 setup_apt_software "python3"
 setup_apt_software "python3-pip" "command -v pip3"
-
-# create and activate a virtual environment for python pip
-PIPVIRTUALENV_DIR="$BaseDir/python-pip-venv"
-if [ ! -d "$PIPVIRTUALENV_DIR" ]; then
-    python3 -m venv "$PIPVIRTUALENV_DIR"
-fi
-source "$PIPVIRTUALENV_DIR/bin/activate"
 
 # install bark ai
 setup_pip_software "bark"
