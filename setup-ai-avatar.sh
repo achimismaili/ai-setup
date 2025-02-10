@@ -98,8 +98,14 @@ setup_ollama_model() {
 }
 
 # Function to check and setup pip packages
+# The function accepts an optional second parameter INDEX_URL.
+# If the second parameter is provided, it will use that URL for the pip install command.
 setup_pip_software() {
     local PACKAGE=$1
+    local INDEX_URL=$2
+
+    # Extract the actual package name by removing anything after the first occurrence of '=' or '-'
+    local PACKAGE_NAME=$(echo "$PACKAGE" | sed 's/[=|-].*//')
 
     # first, check if python and pip is installed and if not, install it
     setup_apt_software "python3"
@@ -116,18 +122,22 @@ setup_pip_software() {
     fi
     source "$PIPVIRTUALENV_DIR/bin/activate"
 
-    if ! pip show "$PACKAGE" &> /dev/null; then
-        echo "Pip package $PACKAGE is not installed. Installing..."
-        pip install "$PACKAGE"
+    if ! pip show "$PACKAGE_NAME" &> /dev/null; then
+        echo "Pip package $PACKAGE_NAME is not installed. Installing..."
+        if [ -n "$INDEX_URL" ]; then
+            pip install "$PACKAGE" --index-url "$INDEX_URL"
+        else
+            pip install "$PACKAGE"
+        fi
 
         # wait for package to install
-        while ! pip show "$PACKAGE" &> /dev/null; do
-            echo "Waiting for $PACKAGE to install..."
+        while ! pip show "$PACKAGE_NAME" &> /dev/null; do
+            echo "Waiting for $PACKAGE_NAME to install..."
             sleep 5
         done
-        echo "$PACKAGE installed successfully!"
+        echo "$PACKAGE_NAME installed successfully!"
     else
-        echo "$PACKAGE already installed!"
+        echo "$PACKAGE_NAME already installed!"
     fi
 }
 
@@ -155,13 +165,15 @@ setup_pip_software "bark"
 # getting torch to work was pain in the a**
 # torch 2.1 does not work with python 3.12 anymore, touch 2.6 causes too many issues, so I selected 2.2.2
 # Following is the command to install torch 2.2.2 with cuda 11.8 (cu118 is the right NVIDIA GPU support version for my GPU)
-pip install torch==2.2.2+cu118 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+setup_pip_software "torch==2.2.2+cu118" "https://download.pytorch.org/whl/cu118"
+setup_pip_software "torchvision" "https://download.pytorch.org/whl/cu118"
+setup_pip_software "torchaudio" "https://download.pytorch.org/whl/cu118"
 
 # setup_pip_software "numpy"
 # current numpy 2.2.2 is not compatible with outdated torch version, so installing numpy 1.26.4
 # ... but numpy 1.26.4 is not available in the default pip repository
 wget https://files.pythonhosted.org/packages/0f/50/de23fde84e45f5c4fda2488c759b69990fd4512387a8632860f3ac9cd225/numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-pip install numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+setup_pip_software numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
 
 setup_pip_software "scipy"
 # for direct sound output
