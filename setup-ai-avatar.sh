@@ -39,9 +39,15 @@ ensure_software_directory() {
 
 # Function to add the missing public key for Microsoft Edge repository
 add_microsoft_edge_gpg_key() {
-    echo "Adding missing GPG key for Microsoft Edge repository..."
-    curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-    sudo apt-get update
+    local KEY_FINGERPRINT="EB3E94ADBE1229CF"
+    if ! gpg --list-keys "$KEY_FINGERPRINT" &> /dev/null; then
+        echo "Adding missing GPG key for Microsoft Edge repository..."
+        curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/edge stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list > /dev/null
+        sudo apt-get update
+    else
+        echo "GPG key for Microsoft Edge repository already exists."
+    fi
 }
 
 # Consolidated function to check and wait for software installation
