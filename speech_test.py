@@ -34,13 +34,14 @@ voices = {
 }
 
 # Show available voices
-print("Available German Voices:")
+print("Verfügbare Stimmen:")
 for i, (name, code) in enumerate(voices.items(), 1):
     print(f"{i}. {name}")
 
 # User selects a voice
-choice = int(input("\nChoose a voice (1-10): ")) - 1
+choice = int(input("\nWählen Sie eine Stimme (1-10): ")) - 1
 voice_preset = list(voices.values())[choice]
+voice_name = list(voices.keys())[choice]
 
 # User input text
 text = input("\nGeben Sie Ihren Text ein: ")
@@ -51,7 +52,7 @@ torch.set_default_device(device)
 
 print(f"Using {device.upper()} for Bark TTS")
 
-print(f"\n🔊 Erstelle Audio für Stimme: {name}")
+print(f"\n🔊 Erstelle Audio für Stimme: {voice_name}")
 audio_array = generate_audio(text, history_prompt=voice_preset)
 
 # Play audio
