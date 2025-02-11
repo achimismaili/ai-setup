@@ -9,7 +9,7 @@ except ImportError:
     print("PyTorch is not installed. Please do not forget to activate a virtual environment, if aplicable, e.g. run:")
     print('source "/home/$(whoami)/ai/python-pip-venv/bin/activate"')
     exit(1)
-    
+
 import sounddevice as sd
 from bark import generate_audio, SAMPLE_RATE
 from scipy.io.wavfile import write
@@ -21,11 +21,16 @@ warnings.filterwarnings("ignore", category=UserWarning, module="torch.utils._dev
 
 # German voice options
 voices = {
-    "German Male 1": "v2/de_speaker_0",
-    "German Male 2": "v2/de_speaker_1",
-    "German Female 1": "v2/de_speaker_2",
-    "German Female 2": "v2/de_speaker_3",
-    "German Female 3": "v2/de_speaker_4",
+    "Default [English]": "v2/en_speaker_0",
+    "Female 1 [English]": "v2/en_speaker_9",
+    "Male 1 [English]": "v2/en_speaker_1",
+    "Male 2 [English]": "v2/en_speaker_2",
+    "Male 3 [English]": "v2/en_speaker_6",
+    "Frau 1 [Deutsch]": "v2/de_speaker_3", 
+    "Mann 1 [Deutsch]": "v2/de_speaker_0",
+    "Mann 2 [Deutsch]": "v2/de_speaker_1",
+    "Mann 3 [Deutsch]": "v2/de_speaker_2",
+    "Mann 4 [Deutsch]": "v2/de_speaker_4",
 }
 
 # Show available voices
@@ -34,7 +39,7 @@ for i, (name, code) in enumerate(voices.items(), 1):
     print(f"{i}. {name}")
 
 # User selects a voice
-choice = int(input("\nChoose a voice (1-5): ")) - 1
+choice = int(input("\nChoose a voice (1-10): ")) - 1
 voice_preset = list(voices.values())[choice]
 
 # User input text
@@ -46,15 +51,15 @@ torch.set_default_device(device)
 
 print(f"Using {device.upper()} for Bark TTS")
 
-# Generate speech
+print(f"\n🔊 Erstelle Audio für Stimme: {name}")
 audio_array = generate_audio(text, history_prompt=voice_preset)
-
-# Save to file
-# output_filename = "bark_deutsch_output.wav"
-# write(output_filename, SAMPLE_RATE, audio_array)
-# print(f"\n✅ Sprachdatei gespeichert als '{output_filename}'")
 
 # Play audio
 print("\n🔊 Spiele Audio ab...")
 sd.play(audio_array, samplerate=SAMPLE_RATE)
 sd.wait()
+
+# Alternatively - Save to file
+# output_filename = "bark_output.wav"
+# write(output_filename, SAMPLE_RATE, audio_array)
+# print(f"\n✅ Sprachdatei gespeichert als '{output_filename}'")
