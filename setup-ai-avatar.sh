@@ -107,19 +107,10 @@ setup_pip_software() {
     # Extract the actual package name by removing anything after the first occurrence of '=' or '-'
     local PACKAGE_NAME=$(echo "$PACKAGE" | sed 's/[=|-].*//')
 
-    # first, check if python and pip is installed and if not, install it
-    setup_apt_software "python3"
-
     # Ensure python3-pip is installed
     setup_apt_software "python3-pip" "command -v pip3"
 
-    # Ensure python3-venv is installed
-    setup_apt_software "python3-venv" "dpkg -l | grep -qw python3-venv"
-
-    # Create and activate the virtual environment if it doesn't exist
-    if [ ! -f "$PIPVIRTUALENV_DIR/bin/activate" ]; then
-        python3 -m venv "$PIPVIRTUALENV_DIR"
-    fi
+    # activate the virtual environment in the function
     source "$PIPVIRTUALENV_DIR/bin/activate"
 
     if ! pip show "$PACKAGE_NAME" &> /dev/null; then
@@ -146,6 +137,19 @@ setup_pip_software() {
 # There was an installation problem with phyton pip, so I added the following line
 # Add missing GPG key for Microsoft Edge repository
 add_microsoft_edge_gpg_key
+
+# setup python3 and python virtual environment plus activate virtual environment
+setup_apt_software "python3"
+
+# Ensure python3-venv is installed
+setup_apt_software "python3-venv" "dpkg -l | grep -qw python3-venv"
+
+# Create and activate the virtual environment if it doesn't exist
+if [ ! -f "$PIPVIRTUALENV_DIR/bin/activate" ]; then
+    python3 -m venv "$PIPVIRTUALENV_DIR"
+fi
+source "$PIPVIRTUALENV_DIR/bin/activate"
+
 
 # setup Ollama
 setup_curl_software "ollama"
@@ -174,10 +178,6 @@ setup_pip_software "torchaudio" "https://download.pytorch.org/whl/cu118"
 # ... but numpy 1.26.4 is not available in the default pip repository
 Numpy_pip_name="numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
 
-if [ ! -f "$PIPVIRTUALENV_DIR/bin/activate" ]; then
-    python3 -m venv "$PIPVIRTUALENV_DIR"
-fi
-source "$PIPVIRTUALENV_DIR/bin/activate"
 if ! pip show "numpy" &> /dev/null; then
     wget "https://files.pythonhosted.org/packages/0f/50/de23fde84e45f5c4fda2488c759b69990fd4512387a8632860f3ac9cd225/$Numpy_pip_name"
 fi 
@@ -205,7 +205,7 @@ fi
 source "$PIPVIRTUALENV_DIR/bin/activate"
 
 # Run the Python script to generate speech
-# python3 /home/ismaili/code/ai-setup/generate_speech.py
+# python3 /home/ismaili/code/ai-setup/speech_test.py
 
 ## run qwen:7b
 # ollama run qwen:7b

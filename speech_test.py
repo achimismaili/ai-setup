@@ -1,7 +1,15 @@
 # import os
 # os.environ["TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD"] = "1"
 
-import torch  # Now PyTorch will respect the setting
+# if torch is not available in the environment, provide error message:
+try:
+    # torch 2.1 does not work with python 3.12 anymore, touch 2.6 causes too many issues with bark, so I selected 2.2.2
+    import torch 
+except ImportError:
+    print("PyTorch is not installed. Please do not forget to activate a virtual environment, if aplicable, e.g. run:")
+    print('source "/home/$(whoami)/ai/python-pip-venv/bin/activate"')
+    exit(1)
+    
 import sounddevice as sd
 from bark import generate_audio, SAMPLE_RATE
 from scipy.io.wavfile import write

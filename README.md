@@ -13,6 +13,16 @@ A script designed to automate the installation and configuration of an AI avatar
 - Downloads necessary model files
 - Sets up AI voice and video processing
 
+### speech_test.py 
+
+An interactive script for text to sound generation with different voices 
+
+#### Features
+- select available voices via number
+- enter any text
+- text gets played 
+- (converting text to wav file is optional and commented out)
+
 ## Requirements
 
 The scripts are tested within the following environment
