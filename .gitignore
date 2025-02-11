@@ -1,2 +1,2 @@
 # keep .whl pip packages out of git
-# *.whl
+*.whl
