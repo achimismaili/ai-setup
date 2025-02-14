@@ -5,7 +5,7 @@
 # just run `python3 ./speech_test.py` in this directory
 
 # Source the shared functions
-source /home/ismaili/code/ai-setup/lib/silent-setup.sh
+source /home/ismaili/code/ai-setup/common/silent-setup.sh
 
 ## Configuration
 

@@ -5,7 +5,7 @@
 # just start it with `ollama run qwen:7b`
 
 # Source the shared functions
-source /home/ismaili/code/ai-setup/lib/silent-setup.sh
+source /home/ismaili/code/ai-setup/common/silent-setup.sh
 
 ## Configuration
 
@@ -17,12 +17,6 @@ BaseDir="/home/$(whoami)/ai"
 # There was an installation problem with phyton pip, so I added the following line
 # Add missing GPG key for Microsoft Edge repository
 add_microsoft_edge_gpg_key
-
-# Create and activate the virtual environment if it doesn't exist
-if [ ! -f "$PIPVIRTUALENV_DIR/bin/activate" ]; then
-    python3 -m venv "$PIPVIRTUALENV_DIR"
-fi
-source "$PIPVIRTUALENV_DIR/bin/activate"
 
 # setup Ollama
 setup_curl_software "ollama"

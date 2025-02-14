@@ -6,4 +6,6 @@
 # ✅ Installs Animation of face & lips while speaking
 # ✅ Installs Real-time AI avatar with face sync and text-to-speech
 
+source /home/ismaili/code/ai-setup/common/silent-setup.sh
+
 # tbd

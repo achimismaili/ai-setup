@@ -6,22 +6,29 @@ This repo serves as a source of ai related scripts.
 
 ### setup-ai-avatar.sh 
 
-A script designed to automate the installation and configuration of an AI avatar environment.
+A script designed to automate the installation and configuration of an AI avatar environment. It runs the following scripts
 
-#### Features
-- Automatically installs required dependencies
-- Downloads necessary model files
-- Sets up AI voice and video processing
+- setup-bark.sh
+- setup-llm.sh 
+
+### setup-bark.sh
+
+This script will set up Bark for text-to-speech
+After running this installation, you can run the speech_test.py script to generate speech.
+just run `python3 ./speech_test.py` in this directory
+
+### setup-llm.sh 
+
+This script will set up Qwen 2.5-7B via Ollama and allows to run it
+After running this installation, you have your local llm ready to answer any question just start it with `ollama run qwen:7b`
 
 ### speech_test.py 
 
-An interactive script for text to sound generation with different voices 
+An interactive script for text to sound generation with different voices, you can select available voices via number and enter any text that then text gets read out loud by the selected voice (converting text to wav file is optional and commented out)
 
-#### Features
-- select available voices via number
-- enter any text
-- text gets played 
-- (converting text to wav file is optional and commented out)
+### (./common/)silent-setup.sh
+
+Common library that takes care, that packages are installed correctly and also not installed multiple times.
 
 ## Requirements
 
